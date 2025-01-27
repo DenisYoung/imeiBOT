@@ -1,0 +1,44 @@
+version: '3.8'
+services:
+  bot:
+    build:
+      context: ./bot
+    container_name: telegram_bot
+    restart: always
+    depends_on:
+      - api
+    networks:
+      - app_network
+
+  api:
+    build:
+      context: ./api
+    container_name: imei_api
+    restart: always
+    ports:
+      - "8000:8000"
+    networks:
+      - app_network
+
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=2131
+      - POSTGRES_DB=postgres
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+        - "5433:5432"
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
+
+volumes:
+  db_data:
+
